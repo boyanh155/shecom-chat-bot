@@ -71,12 +71,10 @@ export function PromptForm({
       
         const responseMessage = await submitUserMessage(value)
         setMessages(prev => prev.filter(v => v.id !== loadingState.id))
-        console.log(responseMessage)
         let answer = ''
         if (responseMessage) {
           answer = responseMessage.find((v: any) => v.type === 'answer').content
         }
-        console.log(answer)
         setMessages(currentMessages => [
           ...currentMessages,
           {

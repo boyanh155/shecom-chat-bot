@@ -9,7 +9,8 @@ import { ChatShareDialog } from '@/components/chat-share-dialog'
 import { useAIState, useActions, useUIState } from 'ai/rsc'
 import type { AI } from '@/lib/chat/actions'
 import { nanoid } from 'nanoid'
-import { UserMessage } from './stocks/message'
+import { BotMessage, LoadingMessage, UserMessage } from './stocks/message'
+import useAiActions from '@/lib/hooks/use-ai-actions'
 
 export interface ChatPanelProps {
   id?: string
@@ -30,29 +31,28 @@ export function ChatPanel({
 }: ChatPanelProps) {
   const [aiState] = useAIState()
   const [messages, setMessages] = useUIState<typeof AI>()
-  const { submitUserMessage } = useActions()
+  const { submitUserMessage } = useAiActions()
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
 
   const exampleMessages = [
     {
-      heading: 'Tư vấn dịch vụ phun mày Hairstroke',
-      subheading: 'trending memecoins today?',
-      message: `What are the trending memecoins today?`
+      heading: 'Tư vấn dịch vụ',
+      subheading: 'Phun mày Hairstroke',
+      message: `Tư vấn dịch vụ Phun Mày Hairstroke`
     },
     {
-      heading: 'Tư vấn dịch vụ trị Nám Multi Layer Melasma',
-      subheading: '$DOGE right now?',
-      message: 'What is the price of $DOGE right now?'
+      heading: 'Tư vấn dịch vụ ',
+      subheading: 'Trị nám Multi Layer Melasma',
+      message: 'Tư vấn dịch vụ Trị nám Multi Layer Melasma'
     },
     {
       heading: 'Cho tôi biết thông tin user JohnDoe với mã số 1',
-      subheading: '42 $DOGE',
-      message: `I would like to buy 42 $DOGE`
+      message: `Give me John Doe user information with ID 1`
     },
     {
       heading: 'Cho tôi biết các dịch vụ của user mã số 1',
-      subheading: `recent events about $DOGE?`,
-      message: `What are some recent events about $DOGE?`
+
+      message: `Tell me the services of user with ID 1`
     }
   ]
 
@@ -81,14 +81,28 @@ export function ChatPanel({
                     }
                   ])
 
+                    const loadingState = {
+                      id: 'loading',
+                      display: <LoadingMessage />
+                    }
+                    setMessages(prev => [...prev, loadingState])
+
                   const responseMessage = await submitUserMessage(
                     example.message
                   )
+        setMessages(prev => prev.filter(v => v.id !== loadingState.id))
+    let answer = ''
+        if (responseMessage) {
+          answer = responseMessage.find((v: any) => v.type === 'answer').content
+        }
 
-                  setMessages(currentMessages => [
-                    ...currentMessages,
-                    responseMessage
-                  ])
+                 setMessages(currentMessages => [
+                   ...currentMessages,
+                   {
+                     id: nanoid(),
+                     display: <BotMessage content={answer} />
+                   }
+                 ])
                 }}
               >
                 <div className="text-sm font-semibold">{example.heading}</div>
