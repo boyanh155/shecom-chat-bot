@@ -1,7 +1,6 @@
 
 export const maxDuration = 60
 import axios from 'axios'
-import { nanoid } from 'nanoid'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const POST = async (request: NextRequest) => {
