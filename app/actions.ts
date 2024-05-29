@@ -149,7 +149,7 @@ export async function refreshHistory(path: string) {
 }
 
 export async function getMissingKeys() {
-  const keysRequired = ['OPENAI_API_KEY']
+  const keysRequired = ['COZE_TOKEN']
   return keysRequired
     .map(key => (process.env[key] ? '' : key))
     .filter(key => key !== '')

@@ -9,8 +9,24 @@ import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import { StreamableValue, useStreamableValue } from 'ai/rsc'
 import { useStreamableText } from '@/lib/hooks/use-streamable-text'
+import { Skeleton } from '../ui/skeleton'
 
 // Different types of message bubbles.
+
+export function LoadingMessage() {
+  return (
+    <div className="group relative flex items-start md:-ml-12">
+      <div className="flex size-[24px] shrink-0 select-none items-center justify-center rounded-md border bg-primary text-primary-foreground shadow-sm">
+        <IconOpenAI />
+      </div>
+      <div className="flex flex-col ml-4 flex-1 space-y-4 overflow-hidden pl-2 ">
+        <Skeleton className="w-full h-4 rounded-full" />
+        <Skeleton className="w-full h-4 rounded-full" />
+        <Skeleton className="w-1/2 h-4 rounded-full" />
+      </div>
+    </div>
+  )
+}
 
 export function UserMessage({ children }: { children: React.ReactNode }) {
   return (

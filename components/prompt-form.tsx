@@ -5,7 +5,7 @@ import Textarea from 'react-textarea-autosize'
 
 import { useActions, useUIState } from 'ai/rsc'
 
-import { UserMessage } from './stocks/message'
+import { BotMessage, LoadingMessage, UserMessage } from './stocks/message'
 import { type AI } from '@/lib/chat/actions'
 import { Button } from '@/components/ui/button'
 import { IconArrowElbow, IconPlus } from '@/components/ui/icons'
@@ -17,6 +17,7 @@ import {
 import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
+import useAiActions from '@/lib/hooks/use-ai-actions'
 
 export function PromptForm({
   input,
@@ -28,7 +29,7 @@ export function PromptForm({
   const router = useRouter()
   const { formRef, onKeyDown } = useEnterSubmit()
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
-  const { submitUserMessage } = useActions()
+  const { submitUserMessage } = useAiActions()
   const [_, setMessages] = useUIState<typeof AI>()
 
   React.useEffect(() => {
@@ -36,7 +37,7 @@ export function PromptForm({
       inputRef.current.focus()
     }
   }, [])
-
+  const [isLoading, setIsLoading] = React.useState(false)
   return (
     <form
       ref={formRef}
@@ -62,8 +63,27 @@ export function PromptForm({
         ])
 
         // Submit and get response message
+        const loadingState = {
+          id: 'loading',
+          display: <LoadingMessage />
+        }
+        setMessages(prev => [...prev, loadingState])
+      
         const responseMessage = await submitUserMessage(value)
-        setMessages(currentMessages => [...currentMessages, responseMessage])
+        setMessages(prev => prev.filter(v => v.id !== loadingState.id))
+        console.log(responseMessage)
+        let answer = ''
+        if (responseMessage) {
+          answer = responseMessage.find((v: any) => v.type === 'answer').content
+        }
+        console.log(answer)
+        setMessages(currentMessages => [
+          ...currentMessages,
+          {
+            id: nanoid(),
+            display: <BotMessage content={answer} />
+          }
+        ])
       }}
     >
       <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-background px-8 sm:rounded-md sm:border sm:px-12">
