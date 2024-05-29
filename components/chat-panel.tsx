@@ -35,22 +35,22 @@ export function ChatPanel({
 
   const exampleMessages = [
     {
-      heading: 'What are the',
+      heading: 'Tư vấn dịch vụ phun mày Hairstroke',
       subheading: 'trending memecoins today?',
       message: `What are the trending memecoins today?`
     },
     {
-      heading: 'What is the price of',
+      heading: 'Tư vấn dịch vụ trị Nám Multi Layer Melasma',
       subheading: '$DOGE right now?',
       message: 'What is the price of $DOGE right now?'
     },
     {
-      heading: 'I would like to buy',
+      heading: 'Cho tôi biết thông tin user JohnDoe với mã số 1',
       subheading: '42 $DOGE',
       message: `I would like to buy 42 $DOGE`
     },
     {
-      heading: 'What are some',
+      heading: 'Cho tôi biết các dịch vụ của user mã số 1',
       subheading: `recent events about $DOGE?`,
       message: `What are some recent events about $DOGE?`
     }
