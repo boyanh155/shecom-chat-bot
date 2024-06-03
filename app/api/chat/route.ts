@@ -7,30 +7,27 @@ export const POST = async (request: NextRequest) => {
   try {
     if (!q)
       return NextResponse.json({ error: 'No query provided' }, { status: 400 })
-    const result = await axios
-      .post(
-        `https://api.coze.com/open_api/v2/chat`,
-        {
-          bot_id: process.env.COZE_BOT_ID,
-          query: q,
-          user: 'LocLe1552001',
-          stream: false
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.COZE_TOKEN}`,
-            'Content-Type': 'application/json',
-            Connection: 'keep-alive',
-            Accept: '*/*'
-          }
+    const result = await axios.post(
+      `https://api.coze.com/open_api/v2/chat`,
+      {
+        bot_id: process.env.COZE_BOT_ID,
+        query: q,
+        user: 'LocLe1552001',
+        stream: false
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.COZE_TOKEN}`,
+          'Content-Type': 'application/json',
+          Connection: 'keep-alive',
+          Accept: '*/*'
         }
-      )
-
-     
+      }
+    )
     //  NextResponse
     const data = result.data
     console.log(data.msg)
-if (data?.code ==702232007)throw new Error(data.msg)
+    if (data?.code == 702232007) throw new Error(data.msg)
     console.log(data)
     let response = data
     if (Array.isArray(data.messages)) {
@@ -48,12 +45,11 @@ if (data?.code ==702232007)throw new Error(data.msg)
       }
     })
   } catch (err: any) {
-
-   return NextResponse.json(
-     { err:err.message },
-     {
-       status: err.statusCode || 500
-     }
-   )
+    return NextResponse.json(
+      { err: err.message },
+      {
+        status: err.statusCode || 500
+      }
+    )
   }
 }

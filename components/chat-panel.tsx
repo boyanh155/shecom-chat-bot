@@ -73,51 +73,50 @@ export function ChatPanel({
                 className={`cursor-pointer rounded-lg border bg-white p-4 hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900 ${
                   index > 1 && 'hidden md:block'
                 }`}
-                onSubmit={async (e: any) => {
-                  e.preventDefault()
+                onClick={async () => {
+                      const loadingState = {
+                        id: 'loading',
+                        display: <LoadingMessage />
+                      }
+                  try {
+                    setMessages(currentMessages => [
+                      ...currentMessages,
+                      {
+                        id: nanoid(),
+                        display: <UserMessage>{example.message}</UserMessage>
+                      }
+                    ])
 
-                  // Blur focus on mobile
-                  if (window.innerWidth < 600) {
-                    e.target['message']?.blur()
-                  }
+                
+                    setMessages(prev => [...prev, loadingState])
 
-                  const value = input.trim()
-                  setInput('')
-                  if (!value) return
-
-                  // Optimistically add user message UI
-                  setMessages(currentMessages => [
-                    ...currentMessages,
-                    {
-                      id: nanoid(),
-                      display: <UserMessage>{value}</UserMessage>
+                    const responseMessage = await submitUserMessage(
+                      example.message
+                    )
+                
+                    let answer = ''
+                    console.log(responseMessage)
+                    if (responseMessage) {
+                      answer = responseMessage.find(
+                        (v: any) => v.type === 'answer'
+                      ).content
                     }
-                  ])
 
-                  // Submit and get response message
-                  const loadingState = {
-                    id: 'loading',
-                    display: <LoadingMessage />
-                  }
-                  setMessages(prev => [...prev, loadingState])
+                    setMessages(currentMessages => [
+                      ...currentMessages,
+                      {
+                        id: nanoid(),
+                        display: <BotMessage content={answer} />
+                      }
+                    ])
+                  } catch (err:any) {
+                    toast.error(err?.response?.data?.err || "Error")
+                  }finally{
+                        setMessages(prev =>
+                          prev.filter(v => v.id !== loadingState.id)
+                        )
 
-                  const responseMessage = await submitUserMessage(value)
-                  setMessages(prev =>
-                    prev.filter(v => v.id !== loadingState.id)
-                  )
-                  let answer = ''
-                  if (responseMessage) {
-                    answer = responseMessage.find(
-                      (v: any) => v.type === 'answer'
-                    ).content
                   }
-                  setMessages(currentMessages => [
-                    ...currentMessages,
-                    {
-                      id: nanoid(),
-                      display: <BotMessage content={answer} />
-                    }
-                  ])
                 }}
               >
                 <div className="text-sm font-semibold">{example.heading}</div>
