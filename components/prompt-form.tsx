@@ -84,7 +84,7 @@ export function PromptForm({
               display: <BotMessage content={answer} />
             }
           ])
-        } catch (err) {
+        } catch (err:any) {
           toast.error(err?.response?.data?.err || 'Error')
         } finally {
           setMessages(prev => prev.filter(v => v.id !== loadingState.id))
