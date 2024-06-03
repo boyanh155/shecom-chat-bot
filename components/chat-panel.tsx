@@ -11,6 +11,7 @@ import type { AI } from '@/lib/chat/actions'
 import { nanoid } from 'nanoid'
 import { BotMessage, LoadingMessage, UserMessage } from './stocks/message'
 import useAiActions from '@/lib/hooks/use-ai-actions'
+import { toast } from 'sonner'
 
 export interface ChatPanelProps {
   id?: string
@@ -72,37 +73,51 @@ export function ChatPanel({
                 className={`cursor-pointer rounded-lg border bg-white p-4 hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900 ${
                   index > 1 && 'hidden md:block'
                 }`}
-                onClick={async () => {
+                onSubmit={async (e: any) => {
+                  e.preventDefault()
+
+                  // Blur focus on mobile
+                  if (window.innerWidth < 600) {
+                    e.target['message']?.blur()
+                  }
+
+                  const value = input.trim()
+                  setInput('')
+                  if (!value) return
+
+                  // Optimistically add user message UI
                   setMessages(currentMessages => [
                     ...currentMessages,
                     {
                       id: nanoid(),
-                      display: <UserMessage>{example.message}</UserMessage>
+                      display: <UserMessage>{value}</UserMessage>
                     }
                   ])
 
-                    const loadingState = {
-                      id: 'loading',
-                      display: <LoadingMessage />
-                    }
-                    setMessages(prev => [...prev, loadingState])
+                  // Submit and get response message
+                  const loadingState = {
+                    id: 'loading',
+                    display: <LoadingMessage />
+                  }
+                  setMessages(prev => [...prev, loadingState])
 
-                  const responseMessage = await submitUserMessage(
-                    example.message
+                  const responseMessage = await submitUserMessage(value)
+                  setMessages(prev =>
+                    prev.filter(v => v.id !== loadingState.id)
                   )
-        setMessages(prev => prev.filter(v => v.id !== loadingState.id))
-    let answer = ''
-        if (responseMessage) {
-          answer = responseMessage.find((v: any) => v.type === 'answer').content
-        }
-
-                 setMessages(currentMessages => [
-                   ...currentMessages,
-                   {
-                     id: nanoid(),
-                     display: <BotMessage content={answer} />
-                   }
-                 ])
+                  let answer = ''
+                  if (responseMessage) {
+                    answer = responseMessage.find(
+                      (v: any) => v.type === 'answer'
+                    ).content
+                  }
+                  setMessages(currentMessages => [
+                    ...currentMessages,
+                    {
+                      id: nanoid(),
+                      display: <BotMessage content={answer} />
+                    }
+                  ])
                 }}
               >
                 <div className="text-sm font-semibold">{example.heading}</div>

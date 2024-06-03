@@ -18,6 +18,7 @@ import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
 import useAiActions from '@/lib/hooks/use-ai-actions'
+import { toast } from 'sonner'
 
 export function PromptForm({
   input,
@@ -67,21 +68,27 @@ export function PromptForm({
           id: 'loading',
           display: <LoadingMessage />
         }
-        setMessages(prev => [...prev, loadingState])
-      
-        const responseMessage = await submitUserMessage(value)
-        setMessages(prev => prev.filter(v => v.id !== loadingState.id))
-        let answer = ''
-        if (responseMessage) {
-          answer = responseMessage.find((v: any) => v.type === 'answer').content
-        }
-        setMessages(currentMessages => [
-          ...currentMessages,
-          {
-            id: nanoid(),
-            display: <BotMessage content={answer} />
+        try {
+          setMessages(prev => [...prev, loadingState])
+          const responseMessage = await submitUserMessage(value)
+          let answer = ''
+          if (responseMessage) {
+            answer = responseMessage.find(
+              (v: any) => v.type === 'answer'
+            ).content
           }
-        ])
+          setMessages(currentMessages => [
+            ...currentMessages,
+            {
+              id: nanoid(),
+              display: <BotMessage content={answer} />
+            }
+          ])
+        } catch (err) {
+          toast.error(err?.response?.data?.err || 'Error')
+        } finally {
+          setMessages(prev => prev.filter(v => v.id !== loadingState.id))
+        }
       }}
     >
       <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-background px-8 sm:rounded-md sm:border sm:px-12">

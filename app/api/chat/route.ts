@@ -2,58 +2,44 @@ export const maxDuration = 60
 import axios from 'axios'
 import { NextRequest, NextResponse } from 'next/server'
 
-import stream from 'stream'
-
 export const POST = async (request: NextRequest) => {
   const q = request.nextUrl.searchParams.get('q')
   try {
     if (!q)
       return NextResponse.json({ error: 'No query provided' }, { status: 400 })
-    console.log(process.env.COZE_TOKEN)
-    console.log(process.env.COZE_BOT_ID)
-   axios.post(
-      `https://api.coze.com/open_api/v2/chat`,
-      {
-        bot_id: process.env.COZE_BOT_ID,
-        query: q,
-        user: 'LocLe1552001',
-        stream: true
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.COZE_TOKEN}`,
-          'Content-Type': 'application/json',
-          Connection: 'keep-alive',
-          Accept: '*/*'
+    const result = await axios
+      .post(
+        `https://api.coze.com/open_api/v2/chat`,
+        {
+          bot_id: process.env.COZE_BOT_ID,
+          query: q,
+          user: 'LocLe1552001',
+          stream: false
         },
-        responseType: 'stream'
-      }
-    )
-.then(streamResponse=>{
-streamResponse.data.pipe(NextResponse)
-}).catch(err=>{
-   return NextResponse.json(
-      { err },
-      {
-        status: err.statusCode || 500
-      }
-    )
-})
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.COZE_TOKEN}`,
+            'Content-Type': 'application/json',
+            Connection: 'keep-alive',
+            Accept: '*/*'
+          }
+        }
+      )
+
+     
     //  NextResponse
+    const data = result.data
+    console.log(data.msg)
+if (data?.code ==702232007)throw new Error(data.msg)
+    console.log(data)
+    let response = data
+    if (Array.isArray(data.messages)) {
+      response = data.messages
+        .filter((v: any) => v.type === 'answer' || v.type === 'follow_up')
+        .map((v: any) => ({ ...v, content: v.content }))
+    }
 
-    // const data = result.data
-    // let response = data
-    // if (Array.isArray(data.messages)) {
-    //   response = data.messages
-    //     .filter((v: any) => v.type === 'answer' || v.type === 'follow_up')
-    //     .map((v: any) => ({ ...v, content: v.content }))
-    // }
-
- 
-   
-
-
-    return new NextResponse("cook", {
+    return new NextResponse(response, {
       status: 200,
       headers: {
         'Content-Type': 'text/event-stream',
@@ -62,11 +48,12 @@ streamResponse.data.pipe(NextResponse)
       }
     })
   } catch (err: any) {
-    return NextResponse.json(
-      { err },
-      {
-        status: err.statusCode || 500
-      }
-    )
+
+   return NextResponse.json(
+     { err:err.message },
+     {
+       status: err.statusCode || 500
+     }
+   )
   }
 }
