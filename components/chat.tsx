@@ -11,6 +11,8 @@ import { Message, Session } from '@/lib/types'
 import { usePathname, useRouter } from 'next/navigation'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { toast } from 'sonner'
+import Script from 'next/script'
+import shecomicon from '@/public/favicon-16x16.png'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages?: Message[]
@@ -61,6 +63,21 @@ export function Chat({ id, className, session, missingKeys }: ChatProps) {
       className="group w-full overflow-auto pl-0 peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]"
       ref={scrollRef}
     >
+      <Script
+        onReady={() => {
+          //@ts-ignore
+          new CozeWebSDK.WebChatClient({
+            config: {
+              bot_id: process.env.COZE_BOT_ID,
+            },
+            componentProps: {
+              title: 'Shecom chatbot',
+              icon: shecomicon.src
+            }
+          })
+        }}
+        src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/0.1.0-beta.2/libs/oversea/index.js"
+      />
       <div
         className={cn('pb-[200px] pt-4 md:pt-10', className)}
         ref={messagesRef}
