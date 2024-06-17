@@ -74,8 +74,9 @@ export function Chat({ id, className, session, missingKeys }: ChatProps) {
               title: 'Shecom chatbot',
               icon: shecomicon.src
             }
-          })
+          }) 
         }}
+        //
         src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/0.1.0-beta.2/libs/oversea/index.js"
       />
       <div
