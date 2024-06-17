@@ -29,6 +29,21 @@ export function Chat({ id, className, session, missingKeys }: ChatProps) {
   const [aiState] = useAIState()
 
   const [_, setNewChatId] = useLocalStorage('newChatId', id)
+  const [isScript, setIsScript] = useState(false)
+  useEffect(() => {
+    console.log(process.env.NEXT_PUBLIC_COZE_BOT_ID)
+    if (isScript)
+      //@ts-ignore
+      new CozeWebSDK.WebChatClient({
+        config: {
+          bot_id: process.env.NEXT_PUBLIC_COZE_BOT_ID
+        },
+        componentProps: {
+          title: 'Shecom chatbot',
+          icon: shecomicon.src
+        }
+      })
+  }, [isScript])
 
   useEffect(() => {
     if (session?.user) {
@@ -64,21 +79,8 @@ export function Chat({ id, className, session, missingKeys }: ChatProps) {
       ref={scrollRef}
     >
       <Script
-        onReady={() => {
-          //@ts-ignore
-          new CozeWebSDK.WebChatClient({
-            config: {
-              bot_id: process.env.COZE_BOT_ID,
-            },
-            componentProps: {
-              title: 'Shecom chatbot',
-              icon: shecomicon.src
-            }
-          }) 
-        }}
-        //
-        src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/0.1.0-beta.2/libs/oversea/index.js"
-      />
+      onReady={() => setIsScript(true)}
+      src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/0.1.0-beta.2/libs/oversea/index.js" />
       <div
         className={cn('pb-[200px] pt-4 md:pt-10', className)}
         ref={messagesRef}

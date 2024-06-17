@@ -149,7 +149,7 @@ export async function refreshHistory(path: string) {
 }
 
 export async function getMissingKeys() {
-  const keysRequired = ['COZE_TOKEN']
+  const keysRequired = ['NEXT_PUBLIC_COZE_TOKEN']
   return keysRequired
     .map(key => (process.env[key] ? '' : key))
     .filter(key => key !== '')

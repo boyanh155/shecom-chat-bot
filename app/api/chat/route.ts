@@ -10,14 +10,14 @@ export const POST = async (request: NextRequest) => {
     const result = await axios.post(
       `https://api.coze.com/open_api/v2/chat`,
       {
-        bot_id: process.env.COZE_BOT_ID,
+        bot_id: process.env.NEXT_PUBLIC_COZE_BOT_ID,
         query: q,
         user: 'LocLe1552001',
         stream: false
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.COZE_TOKEN}`,
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_COZE_TOKEN}`,
           'Content-Type': 'application/json',
           Connection: 'keep-alive',
           Accept: '*/*'
